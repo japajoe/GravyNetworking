@@ -167,7 +167,7 @@ namespace GravyNetworking.Server
                         }
                         else
                         {
-                            Array.Fill<byte>(incomingBuffer, 0);
+                            Array.Clear(incomingBuffer, 0, incomingBuffer.Length);
                             packetInfo.packet.CopyTo(incomingBuffer);
                             PacketReceived?.Invoke(packetInfo.peerId, incomingBuffer, packetInfo.packet.Length, packetInfo.channel);
                             packetInfo.packet.Dispose();
@@ -187,7 +187,7 @@ namespace GravyNetworking.Server
 
         public void Send(int peerId, IPacket packet, byte channelId, ENet.PacketFlags flags)
         {
-            Array.Fill<byte>(outgoingBuffer, 0);
+            Array.Clear(outgoingBuffer, 0, outgoingBuffer.Length);
             BinaryStream stream = new BinaryStream(outgoingBuffer);
             int length = packet.Serialize(stream);
             Send(peerId, outgoingBuffer, length, channelId, flags);
@@ -203,7 +203,7 @@ namespace GravyNetworking.Server
 
         public void Broadcast(IPacket packet, byte channelId, ENet.PacketFlags flags)
         {
-            Array.Fill<byte>(outgoingBuffer, 0);
+            Array.Clear(outgoingBuffer, 0, outgoingBuffer.Length);
             BinaryStream stream = new BinaryStream(outgoingBuffer);
             int length = packet.Serialize(stream);
             Broadcast(outgoingBuffer, length, channelId, flags);
@@ -219,7 +219,7 @@ namespace GravyNetworking.Server
 
         public void BroadcastSelective(int[] clientIds, IPacket packet, byte channelId, ENet.PacketFlags flags)
         {
-            Array.Fill<byte>(outgoingBuffer, 0);
+            Array.Clear(outgoingBuffer, 0, outgoingBuffer.Length);
             BinaryStream stream = new BinaryStream(outgoingBuffer);
             int length = packet.Serialize(stream);
             BroadcastSelective(clientIds, outgoingBuffer, length, channelId, flags);

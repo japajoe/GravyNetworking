@@ -146,7 +146,7 @@ namespace GravyNetworking.Client
                         }
                         else
                         {
-                            Array.Fill<byte>(incomingBuffer, 0);
+                            Array.Clear(incomingBuffer, 0, incomingBuffer.Length);
                             packetInfo.packet.CopyTo(incomingBuffer);
                             PacketReceived?.Invoke(incomingBuffer, packetInfo.packet.Length, packetInfo.channel);
                             packetInfo.packet.Dispose();
@@ -166,7 +166,7 @@ namespace GravyNetworking.Client
 
         public void Send(IPacket packet, byte channelId, ENet.PacketFlags flags)
         {
-            Array.Fill<byte>(outgoingBuffer, 0);
+            Array.Clear(outgoingBuffer, 0, outgoingBuffer.Length);
             BinaryStream stream = new BinaryStream(outgoingBuffer);
             int length = packet.Serialize(stream);
             ENet.Packet enetPacket = default;
