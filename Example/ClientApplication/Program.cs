@@ -12,8 +12,10 @@ namespace ClientApplication
         static void Main(string[] args)
         {
             Console.CancelKeyPress += OnCancelKeyPress;
+
+            NetworkConfig config = new NetworkConfig(7777, "127.0.0.1", 2, 4096, 1024, 4096, 4096);
             
-            client = new NetworkClient("127.0.0.1", 7777, 2, 1024);
+            client = new NetworkClient(config);
             client.Connected += OnConnected;
             client.Disconnected += OnDisconnected;
             client.PacketReceived += OnPacketReceived;

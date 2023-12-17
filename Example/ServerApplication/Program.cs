@@ -12,8 +12,10 @@ namespace ServerApplication
         static void Main(string[] args)
         {
             Console.CancelKeyPress += OnCancelKeyPress;
+
+            NetworkConfig config = new NetworkConfig(7777, 100, 2, 4096, 1024, 4096, 4096, "0.0.0.0", false);
             
-            server = new NetworkServer(7777, 100, 2, 1024);
+            server = new NetworkServer(config);
             server.ClientConnected += OnClientConnected;
             server.ClientDisconnected += OnClientDisconnected;
             server.PacketReceived += OnPacketReceived;
