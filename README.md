@@ -1,5 +1,5 @@
 # GravyNetworking
-A multi threaded networking library on top of ENet. The idea is to have a simple server and client library that require little setup. Both libraries are callback based and structured in a similar manner. Your only responsibility is to handle incoming connections/packets however you like, and implement whatever logic is required to make the experience pleasant for the user.
+A multi threaded networking library on top of [ENet](https://github.com/nxrighthere/ENet-CSharp). The idea is to have a simple server and client library that require little setup. Both libraries are callback based and structured in a similar manner. Your only responsibility is to handle incoming connections/packets however you like, and implement whatever logic is required to make the experience pleasant for the user.
 
 # Installation
 To get the server library:
