@@ -11,6 +11,7 @@
       A multi threaded networking client library on top of ENet.
     </Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/japajoe/GravyNetworking</PackageProjectUrl> 
     <RepositoryUrl>https://github.com/japajoe/GravyNetworking.git</RepositoryUrl> 
     <RepositoryType>git</RepositoryType>
@@ -19,6 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/"/>
     <Content Include="runtimes\**" PackagePath="runtimes" Visible="false" />
   </ItemGroup>
 
