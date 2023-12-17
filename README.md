@@ -4,12 +4,12 @@ A multi threaded networking library on top of ENet. The idea is to have a simple
 # Installation
 To get the server library:
 ```
-dotnet add package JAJ.Packages.GravyNetworking.Server --version 1.1.0
+dotnet add package JAJ.Packages.GravyNetworking.Server --version 1.1.1
 ```
 
 For the client library:
 ```
-dotnet add package JAJ.Packages.GravyNetworking.Client --version 1.1.0
+dotnet add package JAJ.Packages.GravyNetworking.Client --version 1.1.1
 ```
 
 # Example
