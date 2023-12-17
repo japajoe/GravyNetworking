@@ -28,10 +28,11 @@ namespace GravyNetworking.Client
             }
         }
 
-        private string IP;
-        private ushort port;
-        private uint maxChannels;
-        private uint maxPacketSize;
+        private NetworkConfig config;
+        // private string IP;
+        // private ushort port;
+        // private uint maxChannels;
+        // private uint maxPacketSize;
         private volatile bool isRunning;
         private byte[] incomingBuffer;
         private byte[] outgoingBuffer;
@@ -51,23 +52,24 @@ namespace GravyNetworking.Client
             get => isRunning;
         }
 
-        public NetworkClient(string IP, ushort port, uint maxChannels, uint maxPacketSize = 1024)
+        //public NetworkClient(string IP, ushort port, uint maxChannels, uint maxPacketSize = 1024)
+        public NetworkClient(NetworkConfig config)
         {
-            this.IP = IP;
-            this.port = port;
-            this.maxChannels = maxChannels;
-            this.maxPacketSize = maxPacketSize;
+            this.config = config;
 
-            if(this.maxChannels < 1)
-                this.maxChannels = 1;
+            if(this.config.maxChannels < 1)
+                this.config.maxChannels = 1;
 
-            incomingBuffer = new byte[4096];
-            outgoingBuffer = new byte[4096];
+            if(this.config.maxPacketSize > this.config.bufferSize)
+                this.config.maxPacketSize = this.config.bufferSize;
 
-            connectionQueue = new RingBuffer<ConnectionInfo>(32);
-            disconnectionQueue = new RingBuffer<ConnectionInfo>(32);
-            incomingPacketQueue = new RingBuffer<PacketInfo>(4096);
-            outgoingPacketQueue = new RingBuffer<PacketInfo>(4096);
+            incomingBuffer = new byte[this.config.bufferSize];
+            outgoingBuffer = new byte[this.config.bufferSize];
+
+            connectionQueue = new RingBuffer<ConnectionInfo>(1024);
+            disconnectionQueue = new RingBuffer<ConnectionInfo>(1024);
+            incomingPacketQueue = new RingBuffer<PacketInfo>((int)this.config.incomingQueueCapacity);
+            outgoingPacketQueue = new RingBuffer<PacketInfo>((int)this.config.outgoingQueueCapacity);
 
             checksumCallback = new ChecksumCallback(ENet.Library.CRC64);
 
@@ -138,7 +140,7 @@ namespace GravyNetworking.Client
                     if(incomingPacketQueue.TryDequeue(out PacketInfo packetInfo))
                     {
                         //If packet exceeds maximum size, just deallocate it
-                        if(packetInfo.packet.Length > maxPacketSize)
+                        if(packetInfo.packet.Length > config.maxPacketSize)
                         {
                             packetInfo.packet.Dispose();
                         }
@@ -188,8 +190,8 @@ namespace GravyNetworking.Client
             {
                 Address address = new Address();
 
-                address.SetHost(IP);
-                address.Port = port;
+                address.SetHost(config.hostAddress);
+                address.Port = config.port;
 
                 try
                 {
@@ -205,9 +207,9 @@ namespace GravyNetworking.Client
 
                 client.SetChecksumCallback(checksumCallback);
 
-                Peer peer = client.Connect(address, (int)maxChannels);
+                Peer peer = client.Connect(address, (int)config.maxChannels);
 
-                NetworkLog.WriteLine("Client started connecting to: " + IP + ":" + port + ".");
+                NetworkLog.WriteLine("Client started connecting to: " + config.hostAddress + ":" + config.port + ".");
 
                 Event netEvent;
 
@@ -220,7 +222,7 @@ namespace GravyNetworking.Client
                             if(outgoingPacketQueue.TryDequeue(out PacketInfo packetInfo))
                             {
                                 //If packet size exceeds maximum packet size, don't send but just deallocate
-                                if(packetInfo.packet.Length > maxPacketSize)
+                                if(packetInfo.packet.Length > config.maxPacketSize)
                                 {
                                     packetInfo.packet.Dispose();
                                 }

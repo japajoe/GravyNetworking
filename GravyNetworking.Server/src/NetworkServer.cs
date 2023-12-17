@@ -49,13 +49,7 @@ namespace GravyNetworking.Server
             }
         }
 
-        private ushort port;
-        private string bindAddress = "0.0.0.0";
-        private ushort maxClients;
-        private uint maxPacketSize;
-        private uint maxChannels;
-        private bool isFruityDevice = false; //If running on Mac OS probably set to true
-        private bool bindAllInterfaces = false;
+        private NetworkConfig config;
         private byte[] incomingBuffer;
         private byte[] outgoingBuffer;
         private Thread networkThread;
@@ -76,24 +70,27 @@ namespace GravyNetworking.Server
             get => isRunning;
         }
 
-        public NetworkServer(ushort port, ushort maxClients, uint maxChannels, uint maxPacketSize = 1024)
+        public NetworkServer(NetworkConfig config)
         {
-            this.port = port;
-            this.maxClients = maxClients;
-            this.maxChannels = maxChannels;
-            this.maxPacketSize = maxPacketSize;
+            this.config = config;
 
-            if(this.maxChannels < 1)
-                this.maxChannels = 1;
+            if(this.config.maxChannels < 1)
+                this.config.maxChannels = 1;
 
-            peers = new ENet.Peer[maxClients];
-            incomingBuffer = new byte[4096];
-            outgoingBuffer = new byte[4096];
+            if(this.config.maxPacketSize > this.config.bufferSize)
+                this.config.maxPacketSize = this.config.bufferSize;
+
+            if(this.config.maxClients < 1)
+                this.config.maxChannels = 1;
+
+            peers = new ENet.Peer[this.config.maxClients];
+            incomingBuffer = new byte[this.config.bufferSize];
+            outgoingBuffer = new byte[this.config.bufferSize];
 
             connectionQueue = new RingBuffer<ConnectionInfo>(1024);
             disconnectionQueue = new RingBuffer<ConnectionInfo>(1024);
-            incomingPacketQueue = new RingBuffer<PacketInfo>(4096);
-            outgoingPacketQueue = new RingBuffer<PacketInfo>(4096);
+            incomingPacketQueue = new RingBuffer<PacketInfo>((int)this.config.incomingQueueCapacity);
+            outgoingPacketQueue = new RingBuffer<PacketInfo>((int)this.config.outgoingQueueCapacity);
             
             checksumCallback = new ChecksumCallback(ENet.Library.CRC64);
 
@@ -164,7 +161,7 @@ namespace GravyNetworking.Server
                     if(incomingPacketQueue.TryDequeue(out PacketInfo packetInfo))
                     {
                         //If packet exceeds maximum size, just deallocate it
-                        if(packetInfo.packet.Length > maxPacketSize)
+                        if(packetInfo.packet.Length > config.maxPacketSize)
                         {
                             packetInfo.packet.Dispose();
                         }
@@ -243,24 +240,16 @@ namespace GravyNetworking.Server
             {
                 Address address = new Address();
 
-                if (isFruityDevice)
-                {
-                    if (!bindAllInterfaces)
-                        address.SetHost(bindAddress);
-                }
+                if (config.bindAllInterfaces)
+                    address.SetIP("::0"); // Binds any address
                 else
-                {
-                    if (bindAllInterfaces)
-                        address.SetIP("::0"); // Binds any address
-                    else
-                        address.SetHost(bindAddress);
-                }
+                    address.SetHost(config.bindAddress);
 
-                address.Port = port;
+                address.Port = config.port;
                 
                 try
                 {
-                    server.Create(address, maxClients, (int)maxChannels);
+                    server.Create(address, config.maxClients, (int)config.maxChannels);
                 }
                 catch(Exception ex)
                 {
@@ -272,7 +261,7 @@ namespace GravyNetworking.Server
 
                 server.SetChecksumCallback(checksumCallback);
 
-                NetworkLog.WriteLine("Server start listening on port: " + port + ". Max clients: " + maxClients + ".");
+                NetworkLog.WriteLine("Server start listening on port: " + config.port + ". Max clients: " + config.maxClients + ".");
 
                 Event netEvent;
 
@@ -285,7 +274,7 @@ namespace GravyNetworking.Server
                             if(outgoingPacketQueue.TryDequeue(out PacketInfo packetInfo))
                             {
                                 //If packet size exceeds maximum packet size, don't send but just deallocate
-                                if(packetInfo.packet.Length > maxPacketSize)
+                                if(packetInfo.packet.Length > config.maxPacketSize)
                                 {
                                     packetInfo.packet.Dispose();
                                 }
