@@ -1,0 +1,7 @@
+/.vscode
+/GravyNetworking.Client/bin
+/GravyNetworking.Client/obj
+/GravyNetworking.Client/.vscode
+/GravyNetworking.Server/bin
+/GravyNetworking.Server/obj
+/GravyNetworking.Server/.vscode

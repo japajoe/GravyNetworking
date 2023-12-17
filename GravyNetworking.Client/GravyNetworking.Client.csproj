@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net7.0;netstandard2.1</TargetFrameworks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PackageId>JAJ.Packages.GravyNetworking.Client</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>W.M.R Jap-A-Joe</Authors>
+    <PackageTags>ENet RUDP Multiplayer Networking</PackageTags>
+    <Description>
+      A multi threaded networking client library on top of ENet.
+    </Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/japajoe/GravyNetworking</PackageProjectUrl> 
+    <RepositoryUrl>https://github.com/japajoe/GravyNetworking.git</RepositoryUrl> 
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <Copyright>Copyright $([System.DateTime]::Now.Year) W.M.R Jap-A-Joe</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="runtimes\**" PackagePath="runtimes" Visible="false" />
+  </ItemGroup>
+
+</Project>
